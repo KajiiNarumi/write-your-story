@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<!--
+    Escribe tu historia - Editor de Texto
+    © 2024 I. Antoine Suárez V. Todos los derechos reservados.
+
+    Este programa está disponible bajo la Licencia Pública General GNU (GPL).
+
+    Licencia GPL:
+    Este programa es software libre: puedes redistribuirlo y/o modificarlo bajo los términos de la
+    Licencia Pública General de GNU publicada por la Free Software Foundation.
+
+    Para más información sobre estas licencias, visita:
+    - GPL: https://www.gnu.org/licenses/gpl-3.0.html
+-->
+
+
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escribe tu Historia</title>
+
+    <style>
+    body {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100vh;
+        overflow: hidden; /* Elimina barras globales */
+        background-color: #000000;
+        color: #ffffff;
+        font-family: "Courier New", Courier, monospace;
+    }
+
+    h1 {
+        margin: 10px 0;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    hr {
+        width: 95%;
+        border: 1px solid #ffffff;
+        margin: 10px 0;
+    }
+
+    .botones, .formato, .estilos, .simbolos {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+    }
+
+    button {
+        background-color: transparent;
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-family: "Courier New", Courier, monospace;
+        cursor: pointer;
+        transition: background-color 0.3s ease; /* Efecto suave al cambiar de color */
+    }
+
+    button:hover {
+        background-color: #8F8F8F; /* Fondo al pasar el mouse */
+    }
+
+    textarea {
+        width: 90%;
+        max-width: 900px;
+        height: calc(100vh - 250px);
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        outline: none;
+        resize: none;
+        font-size: 18px;
+        line-height: 1.6;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        font-family: "Courier New", Courier, monospace;
+        scrollbar-width: thin; /* Para navegadores que soportan scrollbar-width */
+        scrollbar-color: #333333 transparent; /* Color del scroll y fondo transparente */
+    }
+
+    /* Personalización de la barra de desplazamiento (para navegadores basados en WebKit) */
+    textarea::-webkit-scrollbar {
+        width: 8px; /* Ancho de la barra */
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+        background-color: #333333; /* Color del scroll */
+        border-radius: 4px; /* Bordes redondeados */
+    }
+
+    textarea::-webkit-scrollbar-track {
+        background-color: transparent; /* Fondo transparente */
+    }
+</style>
+
+
+
+</head>
+<body>
+    <h1 id="contador">Párrafos: 0 | Palabras: 0 | Caracteres: 0 - <span id="horaActual"></span></h1>
+
+    <!-- Menú 1 (Documento) -->
+    <div class="botones">
+        <button onclick="copiarTodo()">Copiar</button>
+        <button onclick="pegarTexto()">Pegar</button>
+        <button onclick="borrarTodo()">Borrar</button>
+        <button onclick="guardarComoMarkdown()">Descargar</button>
+        <button onclick="invertirColores()">B/N</button>
+        <button onclick="toggleCronometro()">Cronómetro</button>
+    </div>
+
+    <!-- Menú 2 (Formato de texto) -->
+    <div class="estilos">
+        <button onclick="insertarFormato('# ', '')">H1</button>
+        <button onclick="insertarFormato('## ', '')">H2</button>
+        <button onclick="insertarFormato('### ', '')">H3</button>
+        <button onclick="insertarFormato('> ', '')">Cita</button>
+        <button onclick="insertarFormato('- ', '')">Lista</button>
+        <button onclick="insertarFormato('— ', '')">Diálogo</button>
+        <button onclick="insertarFormato('*** ', '')">Separador</button>
+        <button onclick="insertarFormato('**', '**')"><b> N </b></button>
+        <button onclick="insertarFormato('*', '*')"><i> C </i></button>
+        <button onclick="insertarFormato('~~', '~~')"><s> T </s></button>
+        <button onclick="insertarFormato('¿', '?')">?</button>
+        <button onclick="insertarFormato('¡', '!')">!</button>
+        <button onclick="insertarFormato('‘', '’')">‘C’</button>
+        <button onclick="insertarFormato('“', '”')">"C"</button>
+        <button onclick="insertarFormato('«', '»')">«C»</button>
+        <button onclick="insertarFormato('(', ')')">(P)</button>
+        <button onclick="insertarFormato('[', ']')">[C]</button>
+        <button onclick="insertarFormato('{', '}')">{Ll}</button>
+    </div>
+
+    <hr>
+    <textarea id="editor" placeholder="Empieza a escribir tu historia
+
+Arriba verás los párrafos, palabras, y caracteres y tu hora local.
+
+Usa los botones para:
+- Copiar: Copia todo el texto al portapapeles.
+- Pegar: Pega texto desde el portapapeles al área de texto.
+- Borrar: Limpia todo el contenido después de confirmar.
+- Descargar: Guarda el texto como un archivo .md.
+- B/N: Alterna entre fondo claro y oscuro.
+- Cronómetro: Inicia, pausa el tiempo transcurrido
+- Símbolos especiales: Como ¿, ¡, Comillas, Guion de diálogo, paréntesis...
+
+Aplicar estilos Markdown como:
+- Encabezados: H1, H2, H3.
+- Estilo: Negrita (N), Cursiva (C), Tachado (T).
+- Listas, citas, Separador.
+
+Tu texto se guarda automáticamente y estará disponible al recargar la página.
+
+
+Escribe tu historia - Editor de Texto © 2024 I. Antoine Suárez V. Todos los derechos reservados. Este programa está disponible bajo la Licencia Pública General GNU (GPL). https://www.gnu.org/licenses/gpl-3.0.html
+
+"
+
+
+    ></textarea>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const contador = document.getElementById('contador');
+        const horaActual = document.getElementById('horaActual');
+
+        let coloresInvertidos = false;
+
+        // Función para actualizar el contador de palabras, caracteres, párrafos y hora
+        function actualizarContador() {
+            const texto = editor.value;
+            const palabras = texto.trim() === '' ? 0 : texto.trim().split(/\s+/).length;
+            const caracteres = texto.length;
+            const parrafos = texto.split(/\n+/).filter(parrafo => parrafo.trim() !== '').length;
+            contador.innerHTML = `Párrafos: ${parrafos} | Palabras: ${palabras} | Caracteres: ${caracteres} - ${obtenerHoraActual()}`;
+        }
+
+        // Función para obtener la hora actual en formato 24 horas
+        function obtenerHoraActual() {
+            const ahora = new Date();
+            const horas = ahora.getHours().toString().padStart(2, '0');
+            const minutos = ahora.getMinutes().toString().padStart(2, '0');
+            const segundos = ahora.getSeconds().toString().padStart(2, '0');
+            // return `${horas}:${minutos}:${segundos}`;
+            return `${horas}:${minutos}`;
+        }
+
+        setInterval(actualizarContador, 1000); // Actualiza la hora y el contador cada segundo
+
+        window.addEventListener('load', () => {
+            const contenidoGuardado = localStorage.getItem('contenidoMarkdown');
+            if (contenidoGuardado) {
+                editor.value = contenidoGuardado;
+            }
+            actualizarContador();
+        });
+
+        editor.addEventListener('input', () => {
+            const texto = editor.value;
+            actualizarContador();
+            localStorage.setItem('contenidoMarkdown', texto);
+        });
+
+        function insertarFormato(inicio, fin) {
+            const texto = editor.value;
+            const seleccion = editor.selectionStart;
+            const finSeleccion = editor.selectionEnd;
+            const textoSeleccionado = texto.slice(seleccion, finSeleccion);
+            const nuevoTexto = texto.slice(0, seleccion) + inicio + textoSeleccionado + fin + texto.slice(finSeleccion);
+            editor.value = nuevoTexto;
+            editor.setSelectionRange(seleccion + inicio.length, finSeleccion + inicio.length);
+            actualizarContador();
+        }
+
+        function copiarTodo() {
+            editor.select();
+            document.execCommand('copy');
+        }
+
+        function pegarTexto() {
+            navigator.clipboard.readText().then(texto => {
+                editor.value += texto;
+                actualizarContador();
+            });
+        }
+
+        function borrarTodo() {
+            if (confirm('¿Estás seguro de que quieres borrar todo el contenido?')) {
+                editor.value = '';
+                actualizarContador();
+            }
+        }
+
+        function guardarComoMarkdown() {
+            const contenido = editor.value;
+            const blob = new Blob([contenido], { type: 'text/markdown' });
+            const enlace = document.createElement('a');
+            enlace.href = URL.createObjectURL(blob);
+            enlace.download = 'nota.md';
+            enlace.click();
+        }
+
+        function invertirColores() {
+            if (coloresInvertidos) {
+                document.body.style.backgroundColor = "#000000";
+                document.body.style.color = "#ffffff";
+                editor.style.backgroundColor = "#000000";
+                editor.style.color = "#ffffff";
+
+                document.querySelectorAll('button').forEach((boton) => {
+                    boton.style.color = "#ffffff";
+                    boton.style.border = "1px solid #ffffff";
+                });
+                document.querySelectorAll('hr').forEach((linea) => {
+                    linea.style.borderColor = "#ffffff";
+                });
+            } else {
+                document.body.style.backgroundColor = "#ffffff";
+                document.body.style.color = "#000000";
+                editor.style.backgroundColor = "#ffffff";
+                editor.style.color = "#000000";
+
+                document.querySelectorAll('button').forEach((boton) => {
+                    boton.style.color = "#000000";
+                    boton.style.border = "1px solid #000000";
+                });
+                document.querySelectorAll('hr').forEach((linea) => {
+                    linea.style.borderColor = "#000000";
+                });
+            }
+            coloresInvertidos = !coloresInvertidos;
+        }
+
+        document.body.addEventListener('click', () => {
+            editor.focus();
+        });
+    </script>
+<script>
+    let cronometroActivo = false; // Estado del cronómetro
+    let tiempoTranscurrido = 0;  // Tiempo acumulado en segundos
+    let intervaloCronometro;    // ID del intervalo del cronómetro
+
+    function toggleCronometro() {
+        if (cronometroActivo) {
+            clearInterval(intervaloCronometro);
+        } else {
+            const inicio = Date.now() - tiempoTranscurrido * 1000;
+            intervaloCronometro = setInterval(() => {
+                tiempoTranscurrido = Math.floor((Date.now() - inicio) / 1000);
+                mostrarTiempoCronometro();
+            }, 1000);
+        }
+        cronometroActivo = !cronometroActivo;
+    }
+
+    function mostrarTiempoCronometro() {
+        const horas = Math.floor(tiempoTranscurrido / 3600).toString().padStart(2, '0');
+        const minutos = Math.floor((tiempoTranscurrido % 3600) / 60).toString().padStart(2, '0');
+        const segundos = (tiempoTranscurrido % 60).toString().padStart(2, '0');
+        const botonCronometro = document.querySelector('button[onclick="toggleCronometro()"]');
+        botonCronometro.textContent = `${horas}:${minutos}:${segundos}`;
+    }
+
+    // Inicializar el texto del botón del cronómetro
+    mostrarTiempoCronometro();
+</script>
+
+</body>
+</html>
